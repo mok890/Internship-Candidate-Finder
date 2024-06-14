@@ -20,7 +20,10 @@ public class InternshipCandidateFinder {
             if (uni.getAddress().getState().equals(state) && uni.getAddress().getCity().equals(city)) {
                 for (Course course : uni.getCourses()) {
                     if (course.getName().equals(courseOrArea) || course.getArea().equals(courseOrArea)) {
+
                         candidates.addAll(course.getStudents());
+                        System.out.println(course.getName() + " imk " + course.getArea() + "  " + uni.getName() + " "
+                                + uni.getClass());
                     }
                 }
             }
