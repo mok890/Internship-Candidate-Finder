@@ -14,4 +14,8 @@ public interface UniversityDAO {
     void deleteUniversity(String name);
 
     List<University> getAllUniversities();
+
+    void removeStudent(String enrollment);
+
+    void removeStudentFromCourse(int courseId, String enrollment);
 }

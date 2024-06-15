@@ -9,14 +9,14 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UniversityDAOImpl implements UniversityDAO {
+public class UniversityDAOImpl implements UniversityDAO { // Inheritance
     private Connection connection;
 
     public UniversityDAOImpl(Connection connection) {
         this.connection = connection;
     }
 
-    @Override
+    @Override // Polymorphism
     public void addUniversity(University university) {
         String sql = "INSERT INTO universities (name, address, district, city, state) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -168,6 +168,52 @@ public class UniversityDAOImpl implements UniversityDAO {
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, name);
             pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void removeStudent(String enrollment) {
+        String sql = "DELETE FROM students WHERE enrollment = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, enrollment);
+            pstmt.executeUpdate();
+            System.out.println("Student removed successfully.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void removeStudentFromCourse(int courseId, String enrollment) {
+        String getStudentIdSql = "SELECT id FROM students WHERE enrollment = ?";
+        String deleteLinkSql = "DELETE FROM course_students WHERE course_id = ? AND student_id = ?";
+        String deleteStudentSql = "DELETE FROM students WHERE enrollment = ?";
+
+        try (PreparedStatement getStudentIdStmt = connection.prepareStatement(getStudentIdSql);
+                PreparedStatement deleteLinkStmt = connection.prepareStatement(deleteLinkSql);
+                PreparedStatement deleteStudentStmt = connection.prepareStatement(deleteStudentSql)) {
+
+            // Get the student ID based on the enrollment number
+            getStudentIdStmt.setString(1, enrollment);
+            ResultSet rs = getStudentIdStmt.executeQuery();
+            if (rs.next()) {
+                int studentId = rs.getInt("id");
+
+                // Delete the link between the student and the course
+                deleteLinkStmt.setInt(1, courseId);
+                deleteLinkStmt.setInt(2, studentId);
+                deleteLinkStmt.executeUpdate();
+
+                // Optionally, delete the student from the students table if needed
+                // deleteStudentStmt.setString(1, enrollment);
+                // deleteStudentStmt.executeUpdate();
+
+                System.out.println("Student removed from course successfully.");
+            } else {
+                System.out.println("Student not found.");
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }

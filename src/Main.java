@@ -17,7 +17,7 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         try {
             // Database connection
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/internship_finder_new",
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/internship_finder_new2",
                     "root",
                     "Om#*#12345");
 
@@ -33,14 +33,16 @@ public class Main {
                 System.out.println("2) Add Course");
                 System.out.println("3) Add University");
                 System.out.println("4) Search for Students");
-                System.out.println("5) Exit");
+                System.out.println("5) Remove Student");
+                System.out.println("6) Remove Student from Course");
+                System.out.println("7) Exit");
 
                 int choice = scanner.nextInt();
                 scanner.nextLine(); // Consume newline
 
                 switch (choice) {
                     case 1:
-                        addStudent(scanner);
+                        addStudent(scanner, universityDAO);
                         break;
                     case 2:
                         addCourse(scanner);
@@ -52,6 +54,12 @@ public class Main {
                         searchForStudents(scanner, universityManagement);
                         break;
                     case 5:
+                        removeStudent(scanner, universityDAO);
+                        break;
+                    case 6:
+                        removeStudentFromCourse(scanner, universityDAO);
+                        break;
+                    case 7:
                         exit = true;
                         break;
                     default:
@@ -67,7 +75,7 @@ public class Main {
         }
     }
 
-    private static void addStudent(Scanner scanner) {
+    private static void addStudent(Scanner scanner, UniversityDAOImpl universityDAO) {
         System.out.println("Enter student name:");
         String name = scanner.nextLine();
         System.out.println("Enter student enrollment number:");
@@ -82,7 +90,17 @@ public class Main {
 
         Student student = new Student(name, enrollment, dateOfBirth, yearOfEnrollment, situation);
         // Add student to a course (requires more logic)
+        // Example: universityDAO.addStudent(student);
         System.out.println("Student added successfully.");
+    }
+
+    private static void removeStudentFromCourse(Scanner scanner, UniversityDAOImpl universityDAO) {
+        System.out.println("Enter course ID:");
+        int courseId = scanner.nextInt();
+        scanner.nextLine(); // Consume newline
+        System.out.println("Enter student enrollment number to remove:");
+        String enrollment = scanner.nextLine();
+        universityDAO.removeStudentFromCourse(courseId, enrollment);
     }
 
     private static void addCourse(Scanner scanner) {
@@ -131,5 +149,11 @@ public class Main {
         for (Student candidate : candidates) {
             System.out.println("Name: " + candidate.getName() + ", Enrollment: " + candidate.getEnrollment());
         }
+    }
+
+    private static void removeStudent(Scanner scanner, UniversityDAOImpl universityDAO) {
+        System.out.println("Enter student enrollment number to remove:");
+        String enrollment = scanner.nextLine();
+        universityDAO.removeStudent(enrollment);
     }
 }
